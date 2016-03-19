@@ -1,5 +1,9 @@
 package mak.livewire.geome;
 
+import android.provider.Settings;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
@@ -13,7 +17,8 @@ import android.widget.*;
 import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences;
 import android.location.Geocoder;
-
+import android.location.Location;
+import android.location.LocationManager;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,9 +26,11 @@ import java.util.List;
 
 public class MainActivity extends Activity {
 Button next,done;
-
+CheckBox checkBox;
     EditText t1,t2;
     Geocoder geocoder;
+    AppLocationService appLocationService;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,12 +38,15 @@ Button next,done;
        final TextView tv=(TextView)findViewById(R.id.textView2);
         geocoder=new Geocoder(getApplicationContext());
          next=(Button)findViewById(R.id.next);
-
+        checkBox=(CheckBox)findViewById(R.id.checkBox);
         t1=(EditText)findViewById((R.id.editText));
         t2=(EditText)findViewById((R.id.editText2));
 //initialize
         SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE);
         final Editor editor = pref.edit();
+
+        appLocationService = new AppLocationService(
+                MainActivity.this);
 
         String name=pref.getString("name",null);
         String home=pref.getString("home",null);
@@ -54,7 +64,7 @@ Button next,done;
                 Address address;
                 String name =t1.getText().toString();
                 String home =t2.getText().toString();
-                if(name.equalsIgnoreCase("")||home.equalsIgnoreCase(""))
+                if(name.equalsIgnoreCase("")||(home.equalsIgnoreCase("")&&!checkBox.isChecked()))
                 {
                     Toast.makeText(getApplicationContext(),"Enter Proper Name/Home",Toast.LENGTH_SHORT).show();
                     return;
@@ -64,24 +74,57 @@ Button next,done;
                 editor.commit();
 
 
-                //Toast.makeText(getApplicationContext(),name+" "+home,Toast.LENGTH_SHORT).show();
-                try {
+                Toast.makeText(getApplicationContext(),"Please Wait...",Toast.LENGTH_SHORT).show();
+
+                if(!checkBox.isChecked())
+                {try {
                     list=geocoder.getFromLocationName(home, 3);
                     //address=list.get(0);
                     //tv.setText(address.toString()); //for debug
                     //Toast.makeText(getApplicationContext(),address.toString(),Toast.LENGTH_LONG).show();
                 } catch (IOException e) {
                     e.printStackTrace();
+                }}
+                else
+                {
+                    Location gpsLocation = appLocationService
+                            .getLocation(LocationManager.GPS_PROVIDER);
+                    if (gpsLocation != null) {
+                        try {
+                            list=geocoder.getFromLocation(gpsLocation.getLatitude(), gpsLocation.getLongitude(), 3);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                  else showSettingsAlert();
+
                 }
 
 
+
+
                 setContentView(R.layout.selecthome);
+
                 setRadio(list);
 
 
             }
-        });
+        }); // on click of button
 
+        checkBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(checkBox.isChecked())
+                {t2.setEnabled(false);
+                    t2.setText("");
+                    t2.setHint("");
+                  //  t2.setFocusable(false);
+                }
+                else
+                {t2.setEnabled(true);
+                t2.setHint("Home ( ex Chennai )");}
+            }
+        });
     }
 int getRadioNumber(RadioButton[] rb,int id)
 {for(int i=0;i<3;i++)
@@ -103,6 +146,7 @@ i.putExtra("home",list.get(getRadioNumber(rb,rg.getCheckedRadioButtonId())));
         final Editor editor = pref.edit();
 
         editor.putBoolean("initDone",true);
+
         editor.commit();
 
         startActivity(i);
@@ -124,12 +168,38 @@ i.putExtra("home",list.get(getRadioNumber(rb,rg.getCheckedRadioButtonId())));
    /* rb.setText(list.get(1).getFeatureName()+","+list.get(1).getAdminArea()+","+list.get(1).getPostalCode());
     rb.setText(list.get(2).getFeatureName()+","+list.get(2).getAdminArea()+","+list.get(2).getPostalCode());*/
 }
+
+
+    public void showSettingsAlert() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(
+                MainActivity.this);
+        alertDialog.setTitle("SETTINGS");
+        alertDialog.setMessage("Enable Location Provider! Go to settings menu?");
+        alertDialog.setPositiveButton("Settings",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(
+                                Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        MainActivity.this.startActivity(intent);
+                    }
+                });
+        alertDialog.setNegativeButton("Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+        alertDialog.show();
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
+
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

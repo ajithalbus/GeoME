@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 public class tasks extends Activity {
@@ -17,12 +18,23 @@ TextView greetings;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tasks);
+        Intent i=getIntent();
         pref = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE); //to get i/p name and home addresss
+        final SharedPreferences.Editor editor = pref.edit();
+        Address homeAddress = i.getParcelableExtra("home");
+        if(homeAddress!=null) {
+           // gets address recieved
+            editor.putFloat("homelat", (float) homeAddress.getLatitude());
+            editor.putFloat("homelong", (float) homeAddress.getLongitude());
+            Toast.makeText(getApplicationContext(), homeAddress.getLatitude() + "" + homeAddress.getLongitude(), Toast.LENGTH_SHORT).show();
+
+        }
 
         greetings=(TextView)findViewById(R.id.greetings);
-        Intent i=getIntent();
-       Address homeAddress= i.getParcelableExtra("home"); // gets address recieved
-        greetings.setText("Hello "+ pref.getString("name","")+" :) ");
+
+
+        greetings.setText("Hello "+ pref.getString("name","")+" :) ");// init of tasks till here
+
 
     }
 

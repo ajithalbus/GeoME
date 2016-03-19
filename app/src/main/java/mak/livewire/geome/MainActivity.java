@@ -40,9 +40,10 @@ Button next,done;
 
         String name=pref.getString("name",null);
         String home=pref.getString("home",null);
-        if(name!=null&&home!=null) {
+        if(pref.getBoolean("initDone",false)) {
           //  Toast.makeText(getApplicationContext(), name + " " + home, Toast.LENGTH_SHORT).show();
-            Intent i;
+            startActivity(new Intent(getApplicationContext(),tasks.class));
+            finish();
         }  // go to task activity
 
 
@@ -63,11 +64,11 @@ Button next,done;
                 editor.commit();
 
 
-                Toast.makeText(getApplicationContext(),name+" "+home,Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(),name+" "+home,Toast.LENGTH_SHORT).show();
                 try {
                     list=geocoder.getFromLocationName(home, 3);
-                    address=list.get(0);
-                    tv.setText(address.toString()); //for debug
+                    //address=list.get(0);
+                    //tv.setText(address.toString()); //for debug
                     //Toast.makeText(getApplicationContext(),address.toString(),Toast.LENGTH_LONG).show();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -82,25 +83,42 @@ Button next,done;
         });
 
     }
+int getRadioNumber(RadioButton[] rb,int id)
+{for(int i=0;i<3;i++)
+    if(rb[i].getId()==id) return i;
+    return 0;}
 
-void setRadio(List<Address> list)
-{
+void setRadio(final List<Address> list)
+{final RadioButton[] rb=new RadioButton[3];
+   final RadioGroup rg=(RadioGroup)findViewById(R.id.radioGroup);
+    done=(Button)findViewById(R.id.done);
 done.setOnClickListener(new View.OnClickListener() {
     @Override
     public void onClick(View v) {
         Intent i=new Intent(getApplicationContext(),tasks.class);
-        
+i.putExtra("home",list.get(getRadioNumber(rb,rg.getCheckedRadioButtonId())));
+        //Toast.makeText(getApplicationContext(),getRadioNumber(rb,rg.getCheckedRadioButtonId())+"radio",Toast.LENGTH_SHORT).show();
+
+        SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE);
+        final Editor editor = pref.edit();
+
+        editor.putBoolean("initDone",true);
+        editor.commit();
+
+        startActivity(i);
+        finish();
     }
 });
-    RadioGroup rg=(RadioGroup)findViewById(R.id.radioGroup);
 
 
-Toast.makeText(getApplicationContext(),list.size()+"",Toast.LENGTH_SHORT).show();
+
+//Toast.makeText(getApplicationContext(),list.size()+"",Toast.LENGTH_SHORT).show();
     for(int i=0;i<list.size();i++)
-    {RadioButton rb=new RadioButton(getApplicationContext());
-        rb.setTextColor(Color.BLACK);
-        rb.setText(list.get(i).getFeatureName() + "," + list.get(i).getAdminArea() + "," + list.get(i).getPostalCode());
-        rg.addView(rb,i);
+    {rb[i]=new RadioButton(getApplicationContext());
+        rb[i].setTextColor(Color.BLACK);
+        rb[i].setText(list.get(i).getFeatureName() + " , " + list.get(i).getAdminArea() + " , " + list.get(i).getPostalCode());
+        rg.addView(rb[i],i);
+
     }
    // rg.addView(rb.setText(list.get(0).getFeatureName() + "," + list.get(0).getAdminArea() + "," + list.get(0).getPostalCode()));
    /* rb.setText(list.get(1).getFeatureName()+","+list.get(1).getAdminArea()+","+list.get(1).getPostalCode());

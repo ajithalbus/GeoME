@@ -1,17 +1,29 @@
 package mak.livewire.geome;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.location.Address;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 
 public class tasks extends Activity {
-
+TextView greetings;
+    SharedPreferences pref;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tasks);
+        pref = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE); //to get i/p name and home addresss
+
+        greetings=(TextView)findViewById(R.id.greetings);
+        Intent i=getIntent();
+       Address homeAddress= i.getParcelableExtra("home"); // gets address recieved
+        greetings.setText("Hello "+ pref.getString("name","")+" :) ");
+
     }
 
 

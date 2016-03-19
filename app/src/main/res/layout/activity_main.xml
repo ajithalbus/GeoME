@@ -52,9 +52,10 @@
     android:layout_height="wrap_content"
     android:text="Next"
     android:id="@+id/next"
+    android:layout_marginBottom="47dp"
     android:layout_alignParentBottom="true"
-    android:layout_centerHorizontal="true"
-    android:layout_marginBottom="47dp" />
+    android:layout_alignEnd="@+id/editText2"
+    android:layout_alignStart="@+id/editText2" />
 
 
     </RelativeLayout>

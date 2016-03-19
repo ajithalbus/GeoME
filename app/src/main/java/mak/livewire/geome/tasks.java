@@ -7,6 +7,8 @@ import android.location.Address;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,6 +20,7 @@ TextView greetings;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tasks);
+        startService(new Intent(getApplicationContext(),ReminderService.class));
         Intent i=getIntent();
         pref = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE); //to get i/p name and home addresss
         final SharedPreferences.Editor editor = pref.edit();
@@ -35,6 +38,15 @@ TextView greetings;
 
         greetings.setText("Hello "+ pref.getString("name","")+" :) ");// init of tasks till here
 
+
+
+final Button setreminders=(Button)findViewById(R.id.setR);
+setreminders.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
+        startActivity(new Intent(getApplicationContext(),SetReminders.class));
+    }
+});
 
     }
 

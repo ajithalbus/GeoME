@@ -12,6 +12,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
 
+//copied code
 public class AppLocationService extends Service implements LocationListener {
 
     protected LocationManager locationManager;

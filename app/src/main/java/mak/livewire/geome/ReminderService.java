@@ -17,6 +17,7 @@ public class ReminderService extends Service {
     @Override
     public void onCreate() {
         Toast.makeText(this, "Service was Created", Toast.LENGTH_LONG).show();
+
     }
 
     @Override

@@ -31,9 +31,15 @@
             android:label="@string/title_activity_set_reminders"
             android:screenOrientation="nosensor" >
         </activity>
+
         <service
             android:name=".ReminderService"
             android:enabled="true" />
+
+        <activity
+            android:name=".ShowReminders"
+            android:label="@string/title_activity_show_reminders" >
+        </activity>
     </application>
 
 </manifest>

@@ -15,21 +15,26 @@ import android.widget.Toast;
 
 public class tasks extends Activity {
 TextView greetings;
-    SharedPreferences pref;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tasks);
         startService(new Intent(getApplicationContext(),ReminderService.class));
         Intent i=getIntent();
-        pref = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE); //to get i/p name and home addresss
+        SharedPreferences  pref = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE); //to get i/p name and home addresss
         final SharedPreferences.Editor editor = pref.edit();
         Address homeAddress = i.getParcelableExtra("home");
         if(homeAddress!=null) {
            // gets address recieved
             editor.putFloat("homelat", (float) homeAddress.getLatitude());
             editor.putFloat("homelong", (float) homeAddress.getLongitude());
-            Toast.makeText(getApplicationContext(), homeAddress.getLatitude() + "" + homeAddress.getLongitude(), Toast.LENGTH_SHORT).show();
+            editor.commit();
+            Toast.makeText(getApplicationContext(), pref.getFloat("homelat",0.01f) + "" + pref.getFloat("homelong",0.0f), Toast.LENGTH_SHORT).show();
+
+          // Toast.makeText(getApplicationContext(),"here",Toast.LENGTH_SHORT).show();
+
 
         }
 
@@ -41,6 +46,15 @@ TextView greetings;
 
 
 final Button setreminders=(Button)findViewById(R.id.setR);
+        final Button showreminders=(Button)findViewById(R.id.show);
+
+        showreminders.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(),ShowReminders.class));
+            }
+        });
+
 setreminders.setOnClickListener(new View.OnClickListener() {
     @Override
     public void onClick(View v) {

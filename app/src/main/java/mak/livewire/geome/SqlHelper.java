@@ -2,10 +2,16 @@ package mak.livewire.geome;
 
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
-import android.content.Context;
+
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 import android.widget.Toast;
+import java.util.ArrayList;
+import java.util.List;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
 
 /**
  * Created by Mak on 20-03-2016.
@@ -45,11 +51,41 @@ public class SqlHelper extends SQLiteOpenHelper{
         values.put("forr",record.forr);
         values.put("about",record.about);
         values.put("before",record.before);
-        db.insert(tableName,null,values);
+        db.insert(tableName, null, values);
         //Toast.makeText(appContext,values.toString(),Toast.LENGTH_SHORT).show();
         Toast.makeText(appContext,"Reminder set at "+record.location+" for "+record.forr,Toast.LENGTH_SHORT).show();
         db.close();
     }
 
+
+    public List<ReminderRecord> getAllRecords() {
+        List<ReminderRecord> reminderRecordsList = new ArrayList<ReminderRecord>();
+        // Select All Query
+        String selectQuery = "SELECT  * FROM " + tableName;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                ReminderRecord contact = new ReminderRecord(cursor.getInt(0),cursor.getString(1),cursor.getFloat(2),cursor.getFloat(3),cursor.getString(4),cursor.getString(5),cursor.getFloat(6));
+
+                // Adding contact to list
+                reminderRecordsList.add(contact);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        // return contact list
+        return reminderRecordsList;
+    }
+
+    public void deleteRecord(ReminderRecord contact) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(tableName, "id" + " = ?",
+                new String[] { String.valueOf(contact.id) });
+        db.close();
+    }
 
 }

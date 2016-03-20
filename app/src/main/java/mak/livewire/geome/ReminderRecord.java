@@ -20,4 +20,15 @@ public class ReminderRecord {
         this.before=before;
 
     }
+
+    public ReminderRecord(int id,String location,float lat,float lon,String forr,String about,float before)
+    {   this.id=id;
+        this.location=location;
+        this.lat=lat;
+        this.lon=lon;
+        this.forr=forr;
+        this.about=about;
+        this.before=before;
+
+    }
 }

@@ -31,6 +31,9 @@ public class ReminderRecord {
         this.before=before;
 
     }
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> origin/master
 }
